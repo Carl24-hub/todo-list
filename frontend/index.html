@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .gradient-animation {
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        .task-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .task-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .task-item:hover::before {
+            left: 100%;
+        }
+        
+        .task-item:hover {
+            transform: translateX(5px) translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .masculine-bg {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 25%, #4a5568 50%, #2c5282 75%, #1e3a8a 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2c5282 0%, #1e3a8a 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(44, 82, 130, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(217, 119, 6, 0.4);
+        }
+
+        .suggestion-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .suggestion-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #2c5282, #1e3a8a);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .suggestion-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .suggestion-card:hover {
+            transform: translateY(-3px) scale(1.01);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .filter-btn:hover::before {
+            left: 100%;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #2c5282 0%, #1e3a8a 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(44, 82, 130, 0.3);
+        }
+
+        .filter-btn:hover:not(.active) {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+            transform: translateY(-1px);
+        }
+
+        .pagination-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pagination-btn:hover:not(.disabled) {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+            transform: translateY(-1px);
+        }
+
+        .pagination-btn.active {
+            background: linear-gradient(135deg, #2c5282 0%, #1e3a8a 100%);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .input-field {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 3px rgba(44, 82, 130, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .header-icon {
+            background: linear-gradient(135deg, #2c5282 0%, #1e3a8a 100%);
+            box-shadow: 0 6px 20px rgba(44, 82, 130, 0.3);
+        }
+
+        .title-gradient {
+            background: linear-gradient(135deg, #2c5282 0%, #1e3a8a 50%, #1e40af 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        .task-checkbox {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .task-checkbox:hover {
+            transform: scale(1.05);
+        }
+
+        .empty-state {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body class="masculine-bg min-h-screen flex justify-center items-center p-4">
+    <div class="glass-effect p-6 rounded-2xl shadow-2xl w-full max-w-4xl">
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-14 h-14 header-icon rounded-full mb-4 float-animation">
+                <i class="fas fa-tasks text-white text-xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold title-gradient bg-clip-text text-transparent mb-2">
+                My To-Do List
+            </h1>
+            <p class="text-gray-600 text-sm">Stay organized and productive</p>
+            <div class="w-16 h-0.5 bg-gradient-to-r from-blue-600 to-blue-800 mx-auto mt-3 rounded-full"></div>
+        </div>
+
+        <div class="flex mb-6">
+            <input id="taskInput" type="text" placeholder="What needs to be done?"
+                class="input-field flex-1 px-4 py-2 rounded-l-xl focus:outline-none text-gray-700 placeholder-gray-500 text-sm" />
+            <button onclick="addTask()" class="btn-primary text-white px-4 py-2 rounded-r-xl font-semibold text-sm">
+                <i class="fas fa-plus mr-1"></i>Add Task
+            </button>
+        </div>
+
+        <!-- Dynamic Suggestions Section -->
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                <i class="fas fa-lightbulb mr-2 text-yellow-500 pulse-animation"></i>
+                Today's Suggestions
+                <button onclick="refreshSuggestions()" class="ml-auto text-xs text-gray-500 hover:text-gray-700 transition-colors duration-300">
+                    <i class="fas fa-sync-alt mr-1"></i>Refresh
+                </button>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="suggestionsContainer">
+                <!-- Dynamic suggestions will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="mb-6">
+            <div class="flex justify-start space-x-2">
+                <button onclick="setFilter('all')" id="filter-all" class="filter-btn active px-4 py-2 rounded-lg text-gray-700 font-medium text-sm">
+                    <i class="fas fa-list mr-1"></i>All Tasks
+                </button>
+                <button onclick="setFilter('done')" id="filter-done" class="filter-btn px-4 py-2 rounded-lg text-gray-700 font-medium text-sm">
+                    <i class="fas fa-check-circle mr-1"></i>Completed
+                </button>
+                <button onclick="setFilter('undone')" id="filter-undone" class="filter-btn px-4 py-2 rounded-lg text-gray-700 font-medium text-sm">
+                    <i class="fas fa-clock mr-1"></i>Pending
+                </button>
+            </div>
+        </div>
+
+        <!-- Task Count -->
+        <div class="text-center mb-4">
+            <span id="taskCount" class="text-xs text-gray-600 bg-white bg-opacity-50 px-3 py-1 rounded-full"></span>
+        </div>
+
+        <div class="space-y-3" id="taskList"></div>
+
+        <!-- Pagination Section -->
+        <div class="mt-6 flex justify-center items-center space-x-2" id="paginationContainer">
+            <!-- Pagination buttons will be loaded here -->
+        </div>
+        
+        <div class="text-center mt-6 text-gray-500 text-xs">
+            <i class="fas fa-lightbulb mr-1 text-yellow-400"></i>
+            Click the checkmark to complete tasks, edit icon to modify
+        </div>
+    </div>
+
+<script src="script.js" defer></script>
+</body>
+
+</html>
