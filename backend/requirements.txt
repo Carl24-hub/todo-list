@@ -1,0 +1,8 @@
+# render.yaml
+services:
+  - type: web
+    name: todo-flask-api
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn app:app
+    autoDeploy: true
