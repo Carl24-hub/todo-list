@@ -1,4 +1,4 @@
-const apiUrl = 'https://todo-flask-api-fh6q.onrender.com';
+const apiUrl = 'https://todo-flask-api-fh6q.onrender.com/tasks';
 
 // Global variables for filtering and pagination
 let allTasks = [];
@@ -76,15 +76,15 @@ async function showConfirmation(title, text, icon = 'question') {
 function loadRandomSuggestions() {
     const shuffled = [...suggestionsPool].sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, 3);
-    
+
     const container = document.getElementById('suggestionsContainer');
     container.innerHTML = '';
-    
+
     selected.forEach(suggestion => {
         const card = document.createElement('div');
         card.className = 'suggestion-card p-3 rounded-lg cursor-pointer fade-in';
         card.onclick = () => addSuggestion(suggestion.text);
-        
+
         card.innerHTML = `
             <div class="flex items-center justify-between">
                 <div>
@@ -108,10 +108,10 @@ function refreshSuggestions() {
 // Add suggestion as task
 async function addSuggestion(suggestionText) {
     // Check if task already exists
-    const existingTask = allTasks.find(task => 
+    const existingTask = allTasks.find(task =>
         task.text.toLowerCase().trim() === suggestionText.toLowerCase().trim()
     );
-    
+
     if (existingTask) {
         Swal.fire({
             title: 'Task Already Exists!',
@@ -123,7 +123,7 @@ async function addSuggestion(suggestionText) {
         });
         return;
     }
-    
+
     const input = document.getElementById('taskInput');
     input.value = suggestionText;
     await addTask();
@@ -145,11 +145,11 @@ function getFilteredTasks() {
 function setFilter(filter) {
     currentFilter = filter;
     currentPage = 1; // Reset to first page when changing filter
-    
+
     // Update filter button states
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`filter-${filter}`).classList.add('active');
-    
+
     // Update display
     updateTaskDisplay();
 }
@@ -160,7 +160,7 @@ function updateTaskCount() {
     const totalTasks = allTasks.length;
     const doneTasks = allTasks.filter(task => task.done).length;
     const undoneTasks = allTasks.filter(task => !task.done).length;
-    
+
     let countText = '';
     switch (currentFilter) {
         case 'done':
@@ -172,7 +172,7 @@ function updateTaskCount() {
         default:
             countText = `Showing ${filteredTasks.length} task${filteredTasks.length !== 1 ? 's' : ''} (${doneTasks} done, ${undoneTasks} pending)`;
     }
-    
+
     document.getElementById('taskCount').textContent = countText;
 }
 
@@ -181,14 +181,14 @@ function generatePagination() {
     const filteredTasks = getFilteredTasks();
     const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);
     const container = document.getElementById('paginationContainer');
-    
+
     if (totalPages <= 1) {
         container.innerHTML = '';
         return;
     }
-    
+
     let paginationHTML = '';
-    
+
     // Previous button
     const prevDisabled = currentPage === 1 ? 'disabled' : '';
     paginationHTML += `
@@ -198,7 +198,7 @@ function generatePagination() {
             <i class="fas fa-chevron-left"></i>
         </button>
     `;
-    
+
     // Page numbers
     for (let i = 1; i <= totalPages; i++) {
         const activeClass = i === currentPage ? 'active' : '';
@@ -209,7 +209,7 @@ function generatePagination() {
             </button>
         `;
     }
-    
+
     // Next button
     const nextDisabled = currentPage === totalPages ? 'disabled' : '';
     paginationHTML += `
@@ -219,7 +219,7 @@ function generatePagination() {
             <i class="fas fa-chevron-right"></i>
         </button>
     `;
-    
+
     container.innerHTML = paginationHTML;
 }
 
@@ -227,7 +227,7 @@ function generatePagination() {
 function changePage(page) {
     const filteredTasks = getFilteredTasks();
     const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);
-    
+
     if (page >= 1 && page <= totalPages) {
         currentPage = page;
         updateTaskDisplay();
@@ -240,7 +240,7 @@ function updateTaskDisplay() {
     const startIndex = (currentPage - 1) * tasksPerPage;
     const endIndex = startIndex + tasksPerPage;
     const tasksToShow = filteredTasks.slice(startIndex, endIndex);
-    
+
     const list = document.getElementById('taskList');
     list.innerHTML = '';
 
@@ -256,7 +256,7 @@ function updateTaskDisplay() {
             default:
                 emptyMessage = 'No tasks yet!';
         }
-        
+
         list.innerHTML = `
             <div class="empty-state text-center py-8 rounded-xl fade-in">
                 <i class="fas fa-clipboard-list text-4xl mb-4 text-gray-400"></i>
@@ -270,7 +270,7 @@ function updateTaskDisplay() {
             li.className = `task-item glass-effect p-4 rounded-xl flex justify-between items-center ${task.done ? 'opacity-75' : ''}`;
             li.style.animationDelay = `${index * 0.1}s`;
             li.classList.add('fade-in');
-            
+
             li.innerHTML = `
                 <div class="flex items-center space-x-3 flex-1">
                     <div class="flex-shrink-0">
@@ -304,7 +304,7 @@ function updateTaskDisplay() {
             list.appendChild(li);
         });
     }
-    
+
     updateTaskCount();
     generatePagination();
 }
@@ -351,10 +351,10 @@ async function fetchTasks() {
     try {
         const res = await fetch(apiUrl);
         if (!res.ok) throw new Error('Failed to fetch tasks');
-        
+
         const response = await res.json();
         allTasks = response.data || response; // Store all tasks globally
-        
+
         updateTaskDisplay();
     } catch (error) {
         console.error('Error fetching tasks:', error);
@@ -365,7 +365,7 @@ async function fetchTasks() {
 async function addTask() {
     const input = document.getElementById('taskInput');
     const text = input.value.trim();
-    
+
     if (!text) {
         showError('Please enter a task description');
         input.focus();
@@ -374,7 +374,7 @@ async function addTask() {
 
     try {
         showLoading();
-        
+
         const res = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -385,10 +385,10 @@ async function addTask() {
 
         Swal.close();
         showSuccess('Task added successfully!', 'success');
-        
+
         input.value = '';
         await fetchTasks();
-        
+
         // Reset to "All" filter and first page when adding new task
         setFilter('all');
     } catch (error) {
@@ -401,7 +401,7 @@ async function addTask() {
 async function markDone(id) {
     try {
         const res = await fetch(`${apiUrl}/${id}`, { method: 'PUT' });
-        
+
         if (!res.ok) throw new Error('Failed to mark task as done');
 
         showSuccess('Task completed! 🎉', 'success');
@@ -423,9 +423,9 @@ async function deleteTask(id) {
 
     try {
         showLoading();
-        
+
         const res = await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
-        
+
         if (!res.ok) throw new Error('Failed to delete task');
 
         Swal.close();
@@ -439,21 +439,21 @@ async function deleteTask(id) {
 }
 
 // Handle Enter key in input
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('taskInput');
-    
-    input.addEventListener('keypress', function(e) {
+
+    input.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             addTask();
         }
     });
-    
+
     // Load initial suggestions
     loadRandomSuggestions();
 });
 
 // Initialize the app
-window.onload = async function() {
+window.onload = async function () {
     showLoading();
     await fetchTasks();
     Swal.close();
