@@ -3,7 +3,8 @@ from flask_cors import CORS
 import time
 
 app = Flask(__name__)
-CORS(app)  # Allow frontend to connect
+CORS(app, origins=["https://carltodo-lists.vercel.app"])
+
 
 tasks = []
 task_counter = 0
