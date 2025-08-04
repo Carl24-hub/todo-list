@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: todo-flask-api
+    env: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn backend.app:app
+    autoDeploy: true
