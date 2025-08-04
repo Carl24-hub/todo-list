@@ -4,25 +4,12 @@
     {
       "src": "frontend/index.html",
       "use": "@vercel/static"
-    },
-    {
-      "src": "api/*.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "/frontend/$1"
     }
-  ],
-  "functions": {
-    "api/tasks.js": {
-      "maxDuration": 10
-    }
-  }
-} 
+  ]
+}
