@@ -1,4 +1,4 @@
-const apiUrl = 'http://127.0.0.1:5000/tasks';
+const apiUrl = 'https://todo-flask-api-fh6q.onrender.com';
 
 // Global variables for filtering and pagination
 let allTasks = [];
